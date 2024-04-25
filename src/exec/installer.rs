@@ -22,8 +22,8 @@ use crate::pascal_types::PascalAnsiString;
 // end;
 
 fn run_installer(byte_code: String) {
-    let params = vec![TSetupStep::ssInstall];
-    let proc_name = "CURSTEPCHANGED".to_string();
+    const params = vec![TSetupStep::ssInstall];
+    const proc_name = "CURSTEPCHANGED".to_string();
 
     // Exec.RunProcPN(Params, ProcName);
 }
