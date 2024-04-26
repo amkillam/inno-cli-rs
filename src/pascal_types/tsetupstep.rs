@@ -1,6 +1,7 @@
 #![allow(non_camel_case_types)]
 //Camelcase is used sparingly for setup steps, to match the original Inno Setup PascalScript
 
+#[repr(C)]
 pub enum TSetupStep {
     ssPreInstall,
     ssInstall,
@@ -55,3 +56,4 @@ mod tests {
         assert_eq!(3, TSetupStep::ssDone.try_into().unwrap());
     }
 }
+

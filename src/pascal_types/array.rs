@@ -1,18 +1,16 @@
 // type
-//   DynamicArray = record 
+//   DynamicArray = record
 //     data: ppointer;  // pointer to array of void pointers
-//     cur_size: cuint; // currently allocated size of the array 
+//     cur_size: cuint; // currently allocated size of the array
 //   end;
 
-use std::ops::Index;
 use std::alloc::realloc;
+use std::ops::Index;
 
 #[repr(C)]
-pub struct PascalDynamicArray<T> {
-
+pub struct PascalDynamicArray<T: Sized> {
     data: *mut *mut T, //Nested pointer to first element of the array
     cur_size: u32,
-
 }
 
 impl<T> PascalDynamicArray<T> {
@@ -27,7 +25,8 @@ impl<T> PascalDynamicArray<T> {
         self.cur_size += 1;
 
         let layout = std::alloc::Layout::new::<*mut T>();
-        self.data = unsafe { realloc((*self.data)as *mut u8, layout, self.cur_size as usize) } as *mut *mut T;
+        self.data = unsafe { realloc((*self.data) as *mut u8, layout, self.cur_size as usize) }
+            as *mut *mut T;
         let item_ptr = self.data.wrapping_add(self.cur_size as usize);
         unsafe {
             *item_ptr = item;
@@ -35,7 +34,7 @@ impl<T> PascalDynamicArray<T> {
     }
 
     pub fn get(&self, index: usize) -> *mut T {
-        unsafe {*(self.data.wrapping_add(index))}
+        unsafe { *(self.data.wrapping_add(index)) }
     }
 
     pub fn len(&self) -> u32 {
@@ -52,7 +51,7 @@ impl<T> PascalDynamicArray<T> {
             for i in 0..self.cur_size {
                 //Takes ownership of the boxed value, deallocating it automatically on return
                 let _ = Box::from_raw(self.data.wrapping_add(i as usize));
-            }   
+            }
             let _ = Box::from_raw(self.data);
         }
     }
@@ -68,7 +67,7 @@ impl<T> Index<usize> for PascalDynamicArray<T> {
     type Output = T;
 
     fn index(&self, index: usize) -> &Self::Output {
-        unsafe {&*(self.get(index))}
+        unsafe { &*(self.get(index)) }
     }
 }
 
@@ -169,4 +168,3 @@ mod tests {
         array.free();
     }
 }
-

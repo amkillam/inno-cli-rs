@@ -14,11 +14,10 @@ mod handle_progress;
 mod parse;
 pub mod pascal_types;
 
-use pascal_types::ansistring::PascalAnsiString;
-
 use clap::Parser;
-use std::path::PathBuf;
+use exec::run_installer;
 use mimalloc::MiMalloc;
+use std::path::PathBuf;
 
 #[global_allocator]
 static GLOBAL: MiMalloc = MiMalloc;
@@ -26,7 +25,6 @@ static GLOBAL: MiMalloc = MiMalloc;
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Args {
-
     // Path in which to extract temporary setup files. Defaults to ./tmp if not provided.
     #[arg(short, long, default_value = "./tmp")]
     tmp_dir: PathBuf,
@@ -42,7 +40,6 @@ struct Args {
     // Inno Setup components to install. Defaults to "*" if not provided.
     #[arg(short, long, default_value = "*")]
     components: Vec<String>,
-
 
     // Inno Setup tasks to perform. Defaults to "*" if not provided.
     #[arg(short, long, default_value = "*")]
@@ -90,10 +87,5 @@ fn main() {
     // }
     ;
 
-    let install_script = PascalAnsiString::try_from(install_script).unwrap();
-
-    
-
+    run_installer(install_script);
 }
-
-

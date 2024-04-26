@@ -1,30 +1,28 @@
-use std::convert::{TryFrom, TryInto};
-use crate::pascal_types::PascalAnsiString;
+use crate::pascal_types::{PascalAnsiString, PascalDynamicArray, PascalTPSExec, TSetupStep};
 
-//Various installation step types
-// {$define ssPreInstall := 0}
-// {$define ssInstall := 1}
-// {$define ssPostInstall := 2}
-// {$define ssDone := 3}
-
-
-// type TSetupStep = (ssPreInstall, ssInstall, ssPostInstall, ssDone);
-
-
-
-// function RunInstaller(ByteCode: TbtString);
-// begin
-	
-// 	const Params: array of Variant := [ssInstall];
-// 	const procName: TbtString := 'CURSTEPCHANGED';
-
-// 	return Exec.RunProcPN(Params, ProcName);
-// end;
-
-fn run_installer(byte_code: String) {
-    const params = vec![TSetupStep::ssInstall];
-    const proc_name = "CURSTEPCHANGED".to_string();
-
-    // Exec.RunProcPN(Params, ProcName);
+#[link(name = "inno-cli")]
+extern "C" {
+    fn GenerateExec(byte_code: PascalAnsiString) -> PascalTPSExec;
+    fn ExecRunProcPN(
+        exec: PascalTPSExec,
+        //Should be PascalDynamicArray<PascalVariant> but Rust can't handle PascalVariant's size being unknown
+        //at compile time
+        params: PascalDynamicArray<TSetupStep>,
+        proc_name: PascalAnsiString,
+    ); //This should return a PascalVariant but Rust can't handle PascalVariant's size being unknown at compile time
 }
 
+pub fn generate_exec(byte_code: Vec<u8>) -> PascalTPSExec {
+    let byte_code: PascalAnsiString = PascalAnsiString::try_from(byte_code).unwrap();
+    unsafe { GenerateExec(byte_code) }
+}
+
+pub fn run_installer(byte_code: Vec<u8>) {
+    let setup_step: &mut [TSetupStep] = &mut [TSetupStep::ssInstall];
+    let params: PascalDynamicArray<TSetupStep> =
+        PascalDynamicArray::<TSetupStep>::try_from(setup_step).unwrap();
+    let proc_name: PascalAnsiString = PascalAnsiString::try_from("CURSTEPCHANGED").unwrap();
+
+    let exec: PascalTPSExec = generate_exec(byte_code);
+    unsafe { ExecRunProcPN(exec, params, proc_name) };
+}
