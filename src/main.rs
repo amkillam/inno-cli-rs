@@ -26,31 +26,31 @@ static GLOBAL: MiMalloc = MiMalloc;
 #[command(version, about, long_about = None)]
 struct Args {
     // Path in which to extract temporary setup files. Defaults to ./tmp if not provided.
-    #[arg(short, long, default_value = "./tmp")]
+    #[arg(long, default_value = "./tmp")]
     tmp_dir: PathBuf,
 
     // Path in which to install the setup output
-    #[arg(short, long)]
+    #[arg(long)]
     install_dir: PathBuf,
 
     // Path to the Inno Setup installer
-    #[arg(short, long)]
+    #[arg(long)]
     installer_path: PathBuf,
 
     // Inno Setup components to install. Defaults to "*" if not provided.
-    #[arg(short, long, default_value = "*")]
+    #[arg(long, default_value = "*")]
     components: Vec<String>,
 
     // Inno Setup tasks to perform. Defaults to "*" if not provided.
-    #[arg(short, long, default_value = "*")]
+    #[arg(long, default_value = "*")]
     tasks: Vec<String>,
 
     // Inno Setup install type to complete. Defaults to "full" if not provided.
-    #[arg(short, long, default_value = "full")]
+    #[arg(long, default_value = "full")]
     install_type: String,
 
     // Path to extracted Inno Setup pascalscript bytecode. This will be extracted from the installer if not provided.
-    #[arg(short, long)]
+    #[arg(long)]
     install_script: String,
 }
 

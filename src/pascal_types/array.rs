@@ -155,16 +155,24 @@ mod tests {
         for i in 0..10 {
             let item = Box::into_raw(Box::new(i));
             array.append(item);
-            vec.push(item);
+            vec.push(i);
         }
         assert_eq!(array.len(), 10);
         for i in 0..10 {
-            assert_eq!(array.get(i), vec[i]);
+            assert_eq!(unsafe { *(array.get(i)) }, vec[i]);
         }
-        let vec2: Vec<*mut i32> = array.try_into().unwrap();
+        let vec2: Vec<i32> = array.try_into().unwrap();
         assert_eq!(vec, vec2);
+    }
+
+    #[test]
+    fn test_pascal_dynamic_array_clear() {
+        let mut array = PascalDynamicArray::new();
+        for i in 0..10 {
+            let item = Box::into_raw(Box::new(i));
+            array.append(item);
+        }
         array.clear();
         assert_eq!(array.len(), 0);
-        array.free();
     }
 }
